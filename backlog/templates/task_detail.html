@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ task.title }} - Task Details</title>
+    <link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+</head>
+<body>
+    <h1>{{ task.title }}</h1>
+
+    <div class="task-details">
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p><strong>Priority:</strong> {{ task.priority }}</p>
+        <p><strong>Class:</strong> {{ task.task_class.title }}</p>
+        <p><strong>Additional Info:</strong> {{ task.additional_info }}</p>
+        <p><strong>Completed:</strong> {% if task.completed %}✅ Yes {% else %}❌ No {% endif %}</p>
+    </div>
+
+    <a href="{% url 'task_list' %}" class="back-button">⬅ Back to Task List</a>
+</body>
+</html>

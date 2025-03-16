@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirjautuminen</title>
+    <link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+</head>
+<body>
+    <h2>Kirjaudu sisään</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Kirjaudu</button>
+    </form>
+</body>
+</html>

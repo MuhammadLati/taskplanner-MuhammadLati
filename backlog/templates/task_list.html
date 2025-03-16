@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tehtävälista</title>
+    <link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+</head>
+<body>
+    <h1>Tehtävälista</h1>
+    
+    <div class="kanban-board">
+        <div class="kanban-column">
+            <h2>Todo</h2>
+            <div class="task-list">
+                {% for task in grouped_tasks.todo %}
+                    <div class="task-card">
+                        <h3><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></h3>
+                        {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+                        <p class="priority-text">Priority: {{ task.priority }}</p>
+                    </div>
+                {% empty %}
+                    <p>No tasks in this category</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="kanban-column">
+            <h2>In Progress</h2>
+            <div class="task-list">
+                {% for task in grouped_tasks.in_progress %}
+                    <div class="task-card">
+                        <h3><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></h3>
+                        {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+                        <p class="priority-text">Priority: {{ task.priority }}</p>
+                    </div>
+                {% empty %}
+                    <p>No tasks in this category</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="kanban-column">
+            <h2>Done</h2>
+            <div class="task-list">
+                {% for task in grouped_tasks.done %}
+                    <div class="task-card">
+                        <h3><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></h3>
+                        {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+                        <p class="priority-text">Priority: {{ task.priority }}</p>
+                    </div>
+                {% empty %}
+                    <p>No tasks in this category</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="kanban-column">
+            <h2>Backlog</h2>
+            <div class="task-list">
+                {% for task in grouped_tasks.backlog %}
+                    <div class="task-card">
+                        <h3><a href="{% url 'task_detail' task.id %}">{{ task.title }}</a></h3>
+                        {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+                        <p class="priority-text">Priority: {{ task.priority }}</p>
+                    </div>
+                {% empty %}
+                    <p>No tasks in this category</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

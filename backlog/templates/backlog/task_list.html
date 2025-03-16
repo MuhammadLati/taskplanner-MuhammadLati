@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tehtävälista</title>
+    <link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+</head>
+<body>
+    <div class="header">
+        <h1>Tehtävälista</h1>
+        <p>Tervetuloa, {{ user.username }}!</p>
+        {% if user.is_superuser or user.is_staff %}
+            <p class="admin-notice">Ylläpitäjän näkymä - näet kaikki tehtävät</p>
+        {% else %}
+            <p class="user-notice">Käyttäjän näkymä - näet vain omat tehtäväsi</p>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Kirjaudu ulos</button>
+        </form>
+    </div>
+
+    <h2>Kanban taulu</h2>
+    <div class="kanban-board">
+        <!-- Todo Column -->
+        <div class="kanban-column">
+            <h3>Todo</h3>
+            <div class="task-list">
+                {% for task in grouped_tasks.todo %}
+                    <div class="task-card">
+                        <div class="task-content">
+                            <div class="task-header">
+                                <div class="task-text">{{ task.title }}</div>
+                                {% if task.user %}
+                                    <small class="task-owner">{{ task.user.username }}</small>
+                                {% endif %}
+                            </div>
+                            {% if task.description %}
+                                <small class="task-description">{{ task.description }}</small>
+                            {% endif %}
+                            <div class="task-footer">
+                                <span class="priority-text">Priority: {{ task.priority }}</span>
+                                <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="kanban-column">
+            <h3>In progress</h3>
+            <div class="task-list">
+                {% for task in grouped_tasks.in_progress %}
+                    <div class="task-card">
+                        <div class="task-content">
+                            <div class="task-header">
+                                <div class="task-text">{{ task.title }}</div>
+                                {% if task.user %}
+                                    <small class="task-owner">{{ task.user.username }}</small>
+                                {% endif %}
+                            </div>
+                            {% if task.description %}
+                                <small class="task-description">{{ task.description }}</small>
+                            {% endif %}
+                            <div class="task-footer">
+                                <span class="priority-text">Priority: {{ task.priority }}</span>
+                                <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Done Column -->
+        <div class="kanban-column">
+            <h3>Done</h3>
+            <div class="task-list">
+                {% for task in grouped_tasks.done %}
+                    <div class="task-card">
+                        <div class="task-content">
+                            <div class="task-header">
+                                <div class="task-text">{{ task.title }}</div>
+                                {% if task.user %}
+                                    <small class="task-owner">{{ task.user.username }}</small>
+                                {% endif %}
+                            </div>
+                            {% if task.description %}
+                                <small class="task-description">{{ task.description }}</small>
+                            {% endif %}
+                            <div class="task-footer">
+                                <span class="priority-text">Priority: {{ task.priority }}</span>
+                                <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Backlog Column -->
+        <div class="kanban-column">
+            <h3>Backlog</h3>
+            <div class="task-list">
+                {% for task in grouped_tasks.backlog %}
+                    <div class="task-card">
+                        <div class="task-content">
+                            <div class="task-header">
+                                <div class="task-text">{{ task.title }}</div>
+                                {% if task.user %}
+                                    <small class="task-owner">{{ task.user.username }}</small>
+                                {% endif %}
+                            </div>
+                            {% if task.description %}
+                                <small class="task-description">{{ task.description }}</small>
+                            {% endif %}
+                            <div class="task-footer">
+                                <span class="priority-text">Priority: {{ task.priority }}</span>
+                                <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

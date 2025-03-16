@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Tasks</title>
+</head>
+<body>
+    <h1>All Tasks</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>User</th>
+            <th>Class</th>
+        </tr>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.id }}</td>
+            <td>{{ task.title }}</td>
+            <td>{{ task.user.username }}</td>
+            <td>{{ task.task_class.title }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html> 

@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ task.title }}</title>
+    <link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+</head>
+<body>
+
+<div class="task-detail">
+    <h3>Muokkaa tehtäväkorttia</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Tallenna</button>
+    </form>
+
+    <a href="{% url 'task_list' %}">Takaisin tehtävälistaan</a>
+</div>
+
+</body>
+</html>
