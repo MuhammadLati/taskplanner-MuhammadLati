@@ -1,0 +1,21 @@
+{% extends 'reservations/base.html' %}
+
+{% block content %}
+<h1>Tee varaus: {{ room.name }}</h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="start_time" class="form-label">Alkamisaika</label>
+        <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
+    </div>
+    <div class="mb-3">
+        <label for="end_time" class="form-label">Päättymisaika</label>
+        <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+    </div>
+    <div class="mb-3">
+        <label for="purpose" class="form-label">Käyttötarkoitus</label>
+        <textarea class="form-control" id="purpose" name="purpose" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Tee varaus</button>
+</form>
+{% endblock %}

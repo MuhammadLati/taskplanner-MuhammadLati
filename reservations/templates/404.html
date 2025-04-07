@@ -1,0 +1,14 @@
+{% extends 'reservations/base.html' %}
+
+{% block title %}404 - Sivua ei löydy{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 text-muted">404</h1>
+    <h2 class="mb-4">Sivua ei löydy</h2>
+    <p class="lead mb-4">Hakemaasi sivua ei valitettavasti löydy.</p>
+    <a href="{% url 'reservations:room_list' %}" class="btn btn-primary">
+        <i class="bi bi-house"></i> Palaa etusivulle
+    </a>
+</div>
+{% endblock %} 

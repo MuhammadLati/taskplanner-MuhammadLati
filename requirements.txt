@@ -1,8 +1,53 @@
 asgiref==3.8.1
-dj-database-url==2.3.0
+dj-database-url==2.1.0
 Django==5.1.6
 gunicorn==23.0.0
 packaging==24.2
 sqlparse==0.5.3
 typing_extensions==4.12.2
-whitenoise==6.9.0
+whitenoise==6.6.0
+python-dateutil==2.8.2
+
+# Room examples to add in admin
+rooms = [
+    {
+        'name': 'Conference Room A',
+        'capacity': 20,
+        'location': 'First Floor',
+        'is_active': True
+    },
+    {
+        'name': 'Meeting Room 101',
+        'capacity': 8,
+        'location': 'Second Floor',
+        'is_active': True
+    },
+    {
+        'name': 'Study Room 1',
+        'capacity': 4,
+        'location': 'Library',
+        'is_active': True
+    },
+    {
+        'name': 'Auditorium',
+        'capacity': 100,
+        'location': 'Ground Floor',
+        'is_active': True
+    }
+]
+
+/* Add to your existing CSS */
+.booked-badge {
+    background: #dc3545;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+}
+
+.book-button.booked {
+    background: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+    cursor: not-allowed;
+}

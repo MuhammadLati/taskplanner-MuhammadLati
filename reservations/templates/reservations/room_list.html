@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Reservation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: #1a237e;
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .navbar-brand {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .nav-auth {
+            position: absolute;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .page-title {
+            color: #0066ff;
+            font-size: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .rooms-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            padding: 0 2rem;
+        }
+
+        .room-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .room-name {
+            color: #0066ff;
+            font-size: 1.1rem;
+            font-weight: normal;
+            text-decoration: none;
+        }
+
+        .available-badge {
+            background: #28a745;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .room-info {
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .info-icon {
+            width: 16px;
+            opacity: 0.7;
+        }
+
+        .login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid #dee2e6;
+            color: #0066ff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .login-button:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'reservations:room_list' %}" class="navbar-brand">
+            📅 Room Reservation
+        </a>
+        <div class="nav-auth">
+            {% if user.is_authenticated %}
+                <a href="#" class="nav-link">My Bookings</a>
+                <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="nav-link">🔑 Login</a>
+                <a href="{% url 'register' %}" class="nav-link">👤 Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <h1 class="page-title">Available Rooms</h1>
+    
+    <div class="rooms-grid">
+        {% for room in rooms %}
+        <div class="room-card">
+            <div class="room-header">
+                <span class="room-name">{{ room.name }}</span>
+                <span class="available-badge">Available</span>
+            </div>
+            <div class="room-info">
+                <div class="info-item">
+                    <span class="info-icon">👥</span>
+                    <span>Capacity: {{ room.capacity }} people</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>Location: {{ room.location }}</span>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'reservations:make_reservation' room.id %}" class="login-button">
+                    📅 Book Now
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-button">
+                    🔑 Login to Book
+                </a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p>No rooms available.</p>
+        {% endfor %}
+    </div>
+</body>
+</html> 

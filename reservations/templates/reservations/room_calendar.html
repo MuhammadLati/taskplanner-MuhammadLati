@@ -1,0 +1,62 @@
+{% extends 'reservations/base.html' %}
+
+{% block title %}Kalenteri - {{ room.name }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .calendar-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+    }
+
+    .calendar-day {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .calendar-day.today {
+        background-color: #e3f2fd;
+    }
+
+    .reservation-slot {
+        background: #e8f5e9;
+        border-left: 3px solid #4caf50;
+        padding: 0.5rem;
+        margin: 0.25rem 0;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ room.name }} - Varauskalenteri</h2>
+        <a href="{% url 'reservations:make_reservation' room.id %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Tee varaus
+        </a>
+    </div>
+
+    {% for day in calendar_data %}
+        <div class="calendar-day {% if day.is_today %}today{% endif %}">
+            <h5>{{ day.date|date:"l d.m.Y" }}</h5>
+            {% for reservation in day.reservations %}
+                <div class="reservation-slot">
+                    <div class="d-flex justify-content-between">
+                        <span>{{ reservation.start_time|time:"H:i" }} - {{ reservation.end_time|time:"H:i" }}</span>
+                        <span>{{ reservation.user.get_full_name|default:reservation.user.username }}</span>
+                    </div>
+                    <small class="text-muted">{{ reservation.purpose }}</small>
+                </div>
+            {% empty %}
+                <p class="text-muted mb-0">Ei varauksia</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %} 

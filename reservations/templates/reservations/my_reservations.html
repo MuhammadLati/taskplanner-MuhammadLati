@@ -1,0 +1,94 @@
+{% extends 'reservations/base.html' %}
+
+{% block title %}Omat varaukset{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .reservation-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .reservation-card.cancelled {
+        border-left-color: #f44336;
+    }
+    
+    .reservation-card.active {
+        border-left-color: #4caf50;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: white;
+    }
+    
+    .status-pending { background: #ffc107; }
+    .status-approved { background: #28a745; }
+    .status-cancelled { background: #dc3545; }
+    
+    .reservation-time {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .cancel-button {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Omat varaukset</h2>
+                <a href="{% url 'reservations:room_list' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Tee uusi varaus
+                </a>
+            </div>
+
+            {% if not reservations %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>Sinulla ei ole vielä varauksia.
+            </div>
+            {% endif %}
+
+            {% for reservation in reservations %}
+            <div class="reservation-card {% if reservation.status == 'CANCELLED' %}cancelled{% elif reservation.status == 'APPROVED' %}active{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ reservation.room.name }}</h5>
+                        <span class="status-badge status-{{ reservation.status|lower }}">
+                            {{ reservation.status }}
+                        </span>
+                    </div>
+                    
+                    <div class="reservation-time mb-2">
+                        <i class="bi bi-clock me-2"></i>
+                        {{ reservation.start_time|date:"d.m.Y H:i" }} - {{ reservation.end_time|date:"H:i" }}
+                    </div>
+                    
+                    <p class="card-text mb-3">{{ reservation.purpose }}</p>
+                    
+                    {% if reservation.status != 'CANCELLED' and reservation.start_time > now %}
+                    <form method="post" action="{% url 'reservations:cancel_reservation' reservation.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger cancel-button">
+                            <i class="bi bi-x-lg me-1"></i>Peruuta varaus
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 
