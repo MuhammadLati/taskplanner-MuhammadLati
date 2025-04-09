@@ -1,22 +1,13 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ task.title }} - Tehtävän tiedot</title>
-    <link rel="stylesheet" href="{% static 'backlog/style.css' %}">
-</head>
-<body>
-    <div class="header">
-        <h1>Tehtävälista</h1>
-        <p>Tervetuloa, {{ user.username }}!</p>
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">Kirjaudu ulos</button>
-        </form>
-    </div>
 
+{% block title %}{{ task.title }} - Tehtävän tiedot{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+{% endblock %}
+
+{% block content %}
     <div class="task-detail-container">
         <h1>{{ task.title }}</h1>
         
@@ -106,5 +97,4 @@
             {% endif %}
         </div>
     </div>
-</body>
-</html> 
+{% endblock %} 
