@@ -1,94 +1,93 @@
-{% extends 'base.html' %}
+{% extends 'backlog/base.html' %}
 {% load static %}
 
 {% block title %}Tehtävälista{% endblock %}
 
 {% block extra_css %}
 <style>
-    body {
-        background-color: #fff;
-    }
-
-    .container-fluid {
-        padding: 0 2rem;
-    }
-
-    .page-header {
+    .header-section {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 2rem;
     }
 
-    .kanban-title {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin: 0;
-    }
-
-    .btn-new-task {
+    .new-task-btn {
         background-color: #0d6efd;
         color: white;
-        border: none;
         padding: 0.5rem 1rem;
         border-radius: 4px;
         text-decoration: none;
+        font-size: 0.875rem;
     }
 
-    .btn-new-task:hover {
+    .new-task-btn:hover {
         background-color: #0b5ed7;
         color: white;
     }
 
-    .kanban-board {
+    .task-container {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
+        gap: 1rem;
+        margin-top: 1rem;
     }
 
-    .kanban-column {
+    .task-column {
         background: #f8f9fa;
         border-radius: 8px;
-        padding: 1.5rem;
+        padding: 1rem;
+        min-height: 200px;
     }
 
-    .kanban-column h3 {
-        font-size: 1rem;
+    .task-column h3 {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: #333;
         font-weight: 500;
-        color: #212529;
-        margin: 0 0 1rem 0;
     }
 
     .task-card {
         background: white;
-        border-radius: 6px;
+        border-radius: 4px;
         padding: 1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 0.75rem;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
     .task-title {
-        font-size: 0.9375rem;
-        color: #212529;
+        font-weight: 500;
         margin-bottom: 0.5rem;
+        color: #333;
     }
 
     .task-description {
         font-size: 0.875rem;
-        color: #6c757d;
-        margin-bottom: 0.75rem;
-    }
-
-    .task-status {
-        font-size: 0.875rem;
-        color: #6c757d;
-        display: flex;
-        align-items: center;
+        color: #666;
         margin-bottom: 0.5rem;
     }
 
-    .task-status i {
-        margin-right: 0.5rem;
+    .status-icon {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-icon i {
+        margin-right: 0.25rem;
+    }
+
+    .status-icon.valmis {
+        color: #198754;
+    }
+
+    .status-icon.kesken {
+        color: #dc3545;
+    }
+
+    .status-icon.in-progress {
+        color: #0d6efd;
     }
 
     .task-link {
@@ -102,100 +101,98 @@
         text-decoration: underline;
     }
 
-    .user-notice {
-        background-color: #e7f3ed;
-        color: #0f5132;
-        padding: 0.75rem 1rem;
-        border-radius: 4px;
-        margin-bottom: 1.5rem;
+    .empty-column-text {
+        color: #6c757d;
         font-size: 0.875rem;
+        text-align: center;
+        margin-top: 2rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    {% if not user.is_superuser and not user.is_staff %}
-        <div class="user-notice">
-            <i class="bi bi-person"></i> Käyttäjän näkymä - näet vain omat tehtäväsi
-        </div>
-    {% endif %}
+<div class="header-section">
+    <h2>Kanban taulu</h2>
+    <a href="{% url 'task_edit_model_form' 0 %}" class="new-task-btn">
+        <i class="bi bi-plus-lg"></i> Uusi tehtävä
+    </a>
+</div>
 
-    <div class="page-header">
-        <h2 class="kanban-title">Kanban taulu</h2>
-        <a href="{% url 'task_edit_model_form' 0 %}" class="btn-new-task">
-            + Kirjaudu ulos
-        </a>
+<div class="task-container">
+    <!-- Todo Column -->
+    <div class="task-column">
+        <h3>Todo</h3>
+        {% for task in grouped_tasks.todo %}
+            <div class="task-card">
+                <div class="task-title">{{ task.title }}</div>
+                {% if task.description %}
+                    <p class="task-description">{{ task.description }}</p>
+                {% endif %}
+                <div class="status-icon kesken">
+                    <i class="bi bi-x-circle"></i> Kesken
+                </div>
+                <a href="{% url 'task_detail' task.id %}" class="task-link">Näytä tiedot</a>
+            </div>
+        {% empty %}
+            <p class="empty-column-text">Ei tehtäviä</p>
+        {% endfor %}
     </div>
 
-    <div class="kanban-board">
-        <!-- Todo Column -->
-        <div class="kanban-column">
-            <h3>Todo</h3>
-            {% for task in grouped_tasks.todo %}
-                <div class="task-card">
-                    <div class="task-title">{{ task.title }}</div>
-                    {% if task.description %}
-                        <div class="task-description">{{ task.description }}</div>
-                    {% endif %}
-                    <div class="task-status">
-                        <i class="bi bi-arrow-repeat"></i> In Progress
-                    </div>
-                    <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+    <!-- In Progress Column -->
+    <div class="task-column">
+        <h3>In Progress</h3>
+        {% for task in grouped_tasks.in_progress %}
+            <div class="task-card">
+                <div class="task-title">{{ task.title }}</div>
+                {% if task.description %}
+                    <p class="task-description">{{ task.description }}</p>
+                {% endif %}
+                <div class="status-icon in-progress">
+                    <i class="bi bi-arrow-repeat"></i> In Progress
                 </div>
-            {% endfor %}
-        </div>
+                <a href="{% url 'task_detail' task.id %}" class="task-link">Näytä tiedot</a>
+            </div>
+        {% empty %}
+            <p class="empty-column-text">Ei tehtäviä</p>
+        {% endfor %}
+    </div>
 
-        <!-- In Progress Column -->
-        <div class="kanban-column">
-            <h3>In progress</h3>
-            {% for task in grouped_tasks.in_progress %}
-                <div class="task-card">
-                    <div class="task-title">{{ task.title }}</div>
-                    {% if task.description %}
-                        <div class="task-description">{{ task.description }}</div>
-                    {% endif %}
-                    <div class="task-status">
-                        <i class="bi bi-arrow-repeat"></i> In Progress
-                    </div>
-                    <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+    <!-- Done Column -->
+    <div class="task-column">
+        <h3>Done</h3>
+        {% for task in grouped_tasks.done %}
+            <div class="task-card">
+                <div class="task-title">{{ task.title }}</div>
+                {% if task.description %}
+                    <p class="task-description">{{ task.description }}</p>
+                {% endif %}
+                <div class="status-icon valmis">
+                    <i class="bi bi-check-circle-fill"></i> Valmis
                 </div>
-            {% endfor %}
-        </div>
+                <a href="{% url 'task_detail' task.id %}" class="task-link">Näytä tiedot</a>
+            </div>
+        {% empty %}
+            <p class="empty-column-text">Ei tehtäviä</p>
+        {% endfor %}
+    </div>
 
-        <!-- Done Column -->
-        <div class="kanban-column">
-            <h3>Done</h3>
-            {% for task in grouped_tasks.done %}
-                <div class="task-card">
-                    <div class="task-title">{{ task.title }}</div>
-                    {% if task.description %}
-                        <div class="task-description">{{ task.description }}</div>
-                    {% endif %}
-                    <div class="task-status">
-                        <i class="bi bi-check2"></i> Done
-                    </div>
-                    <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
+    <!-- Backlog Column -->
+    <div class="task-column">
+        <h3>Backlog</h3>
+        {% for task in grouped_tasks.backlog %}
+            <div class="task-card">
+                <div class="task-title">{{ task.title }}</div>
+                {% if task.description %}
+                    <p class="task-description">{{ task.description }}</p>
+                {% endif %}
+                <div class="status-icon kesken">
+                    <i class="bi bi-x-circle"></i> Kesken
                 </div>
-            {% endfor %}
-        </div>
-
-        <!-- Backlog Column -->
-        <div class="kanban-column">
-            <h3>Backlog</h3>
-            {% for task in grouped_tasks.backlog %}
-                <div class="task-card">
-                    <div class="task-title">{{ task.title }}</div>
-                    {% if task.description %}
-                        <div class="task-description">{{ task.description }}</div>
-                    {% endif %}
-                    <div class="task-status">
-                        <i class="bi bi-clock"></i> Pending
-                    </div>
-                    <a href="{% url 'task_detail' task.id %}" class="task-link">View Details</a>
-                </div>
-            {% endfor %}
-        </div>
+                <a href="{% url 'task_detail' task.id %}" class="task-link">Näytä tiedot</a>
+            </div>
+        {% empty %}
+            <p class="empty-column-text">Ei tehtäviä</p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %} 

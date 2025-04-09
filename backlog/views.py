@@ -46,24 +46,32 @@ def task_detail(request, task_id):
 
 @login_required
 def task_edit_model_form(request, task_id):
-    """Edit a task using model form."""
-    task = get_object_or_404(Task, id=task_id)
-    
-    # Check if user has permission to edit this task
-    if not (request.user.is_superuser or request.user.is_staff) and task.user != request.user:
-        return HttpResponseForbidden("Et voi muokata tätä tehtävää.")
+    """Edit a task using model form or create a new one if task_id is 0."""
+    if task_id == 0:
+        # Creating a new task
+        task = None
+    else:
+        # Editing existing task
+        task = get_object_or_404(Task, id=task_id)
+        # Check if user has permission to edit this task
+        if not (request.user.is_superuser or request.user.is_staff) and task.user != request.user:
+            return HttpResponseForbidden("Et voi muokata tätä tehtävää.")
     
     if request.method == 'POST':
         form = TaskEditModelForm(request.POST, instance=task)
         if form.is_valid():
-            task = form.save(commit=False)
-            if not task.user:  # If task doesn't have a user assigned
-                task.user = request.user  # Assign current user
-            task.save()
+            new_task = form.save(commit=False)
+            new_task.user = request.user  # Always assign the current user
+            new_task.save()
             return redirect('task_list')
     else:
         form = TaskEditModelForm(instance=task)
-    return render(request, 'backlog/task_edit_form.html', {'form': form, 'task': task})
+    
+    return render(request, 'backlog/task_edit_form.html', {
+        'form': form, 
+        'task': task,
+        'is_new': task_id == 0
+    })
 
 @login_required
 def toggle_task_status(request, task_id):

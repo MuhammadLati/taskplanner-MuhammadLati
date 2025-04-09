@@ -2,42 +2,187 @@
 {% load static %}
 {% load form_filters %}
 
-{% block title %}{{ task.title }} - Muokkaa{% endblock %}
+{% block title %}{% if is_new %}Uusi tehtävä{% else %}{{ task.title }} - Muokkaa{% endif %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+<style>
+    .container {
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+    }
+
+    .form-header h1 {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.625rem;
+        font-size: 0.875rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background-color: #fff;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13,110,253,.25);
+        outline: none;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .form-text {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .form-check-input {
+        margin-right: 0.5rem;
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5c636a;
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        padding-right: 2.5rem;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0">Muokkaa tehtäväkorttia</h3>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field|addclass:'form-control' }}
-                                {% if field.errors %}
-                                    <div class="text-danger">
-                                        {{ field.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                        <div class="d-flex justify-content-between">
-                            <a href="{% url 'task_list' %}" class="btn btn-secondary">Takaisin tehtävälistaan</a>
-                            <button type="submit" class="btn btn-primary">Tallenna</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <div class="form-header">
+        <h1>{% if is_new %}Uusi tehtävä{% else %}Muokkaa tehtävää{% endif %}</h1>
     </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label class="form-label" for="{{ form.title.id_for_label }}">Otsikko</label>
+            {{ form.title|addclass:'form-control' }}
+            {% if form.title.errors %}
+                <div class="text-danger">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.description.id_for_label }}">Kuvaus</label>
+            {{ form.description|addclass:'form-control' }}
+            {% if form.description.errors %}
+                <div class="text-danger">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.task_class.id_for_label }}">Tehtäväluokka</label>
+            {{ form.task_class|addclass:'form-control' }}
+            {% if form.task_class.errors %}
+                <div class="text-danger">{{ form.task_class.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.priority.id_for_label }}">Prioriteetti</label>
+            {{ form.priority|addclass:'form-control' }}
+            {% if form.priority.errors %}
+                <div class="text-danger">{{ form.priority.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <div class="form-check">
+                {{ form.completed|addclass:'form-check-input' }}
+                <label class="form-check-label" for="{{ form.completed.id_for_label }}">Valmis</label>
+            </div>
+            {% if form.completed.errors %}
+                <div class="text-danger">{{ form.completed.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.additional_info.id_for_label }}">Lisätiedot</label>
+            {{ form.additional_info|addclass:'form-control' }}
+            {% if form.additional_info.errors %}
+                <div class="text-danger">{{ form.additional_info.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-buttons">
+            <a href="{% url 'task_list' %}" class="btn btn-secondary">Takaisin</a>
+            <button type="submit" class="btn btn-primary">{% if is_new %}Luo tehtävä{% else %}Tallenna{% endif %}</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

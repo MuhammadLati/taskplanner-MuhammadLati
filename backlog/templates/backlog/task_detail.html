@@ -1,100 +1,219 @@
-{% extends 'base.html' %}
+{% extends 'backlog/base.html' %}
 {% load static %}
 
 {% block title %}{{ task.title }} - Tehtävän tiedot{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'backlog/style.css' %}">
+<style>
+    .task-detail {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .task-header {
+        margin-bottom: 2rem;
+    }
+
+    .task-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .task-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    .task-status.valmis {
+        background-color: #e7f3ed;
+        color: #198754;
+    }
+
+    .task-status.kesken {
+        background-color: #f8d7da;
+        color: #dc3545;
+    }
+
+    .task-status i {
+        margin-right: 0.5rem;
+    }
+
+    .task-info {
+        margin-bottom: 2rem;
+    }
+
+    .task-info-item {
+        margin-bottom: 1rem;
+    }
+
+    .task-info-label {
+        font-weight: 500;
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+
+    .task-description {
+        line-height: 1.5;
+        color: #333;
+    }
+
+    .task-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        text-decoration: none;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="task-detail-container">
-        <h1>{{ task.title }}</h1>
-        
-        <div class="task-actions">
-            <a href="{% url 'task_list' %}" class="button">← Takaisin tehtävälistaan</a>
-            <a href="{% url 'task_edit_model_form' task.id %}" class="button edit-button">Muokkaa</a>
-            {% if user.is_superuser or task.user == user %}
-                <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
+<div class="task-detail">
+    <div class="task-header">
+        <h1 class="task-title">{{ task.title }}</h1>
+        <div class="task-status {% if task.completed %}valmis{% else %}kesken{% endif %}">
+            {% if task.completed %}
+                <i class="bi bi-check-circle-fill"></i> Valmis
+            {% else %}
+                <i class="bi bi-x-circle"></i> Kesken
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="task-info">
+        {% if task.description %}
+            <div class="task-info-item">
+                <div class="task-info-label">Kuvaus</div>
+                <div class="task-description">{{ task.description }}</div>
+            </div>
+        {% endif %}
+
+        <div class="task-info-item">
+            <div class="task-info-label">Tehtäväluokka</div>
+            <div>{{ task.task_class.title }}</div>
+        </div>
+
+        <div class="task-info-item">
+            <div class="task-info-label">Prioriteetti</div>
+            <div>{{ task.get_priority_display }}</div>
+        </div>
+
+        {% if task.additional_info %}
+            <div class="task-info-item">
+                <div class="task-info-label">Lisätiedot</div>
+                <div>{{ task.additional_info }}</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="task-actions">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary">Takaisin</a>
+        <a href="{% url 'task_edit_model_form' task.id %}" class="btn btn-primary">Muokkaa</a>
+        <form method="post" action="{% url 'toggle_task_status' task.id %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">
+                {% if task.completed %}Merkitse keskeneräiseksi{% else %}Merkitse valmiiksi{% endif %}
+            </button>
+        </form>
+        {% if user.is_superuser or task.user == user %}
+            <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Haluatko varmasti poistaa tämän tehtävän?');">
+                    Poista
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <div class="move-task-section">
+        <h3>Siirrä tehtävä</h3>
+        <div class="move-buttons">
+            {% if task.task_class.title != "Todo" %}
+                <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" class="button delete-button" onclick="return confirm('Haluatko varmasti poistaa tämän tehtävän?')">
-                        Poista tehtävä
-                    </button>
+                    <input type="hidden" name="task_class" value="Todo">
+                    <button type="submit" class="button move-button">Siirrä Todo</button>
                 </form>
             {% endif %}
-        </div>
-
-        <div class="task-details">
-            <p><strong>Kuvaus:</strong> {{ task.description }}</p>
-            <p><strong>Tila:</strong> {{ task.task_class.title }}</p>
-            <p><strong>Prioriteetti:</strong> {{ task.priority }}</p>
-            <p><strong>Omistaja:</strong> {{ task.user.username }}</p>
-            <p><strong>Luotu:</strong> {{ task.created_at|date:"d.m.Y H:i" }}</p>
-            {% if task.additional_info %}
-                <p><strong>Lisätiedot:</strong> {{ task.additional_info }}</p>
-            {% endif %}
-        </div>
-
-        <div class="move-task-section">
-            <h3>Siirrä tehtävä</h3>
-            <div class="move-buttons">
-                {% if task.task_class.title != "Todo" %}
-                    <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="task_class" value="Todo">
-                        <button type="submit" class="button move-button">Siirrä Todo</button>
-                    </form>
-                {% endif %}
-                
-                {% if task.task_class.title != "In progress" %}
-                    <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="task_class" value="In progress">
-                        <button type="submit" class="button move-button">Siirrä In Progress</button>
-                    </form>
-                {% endif %}
-                
-                {% if task.task_class.title != "Done" %}
-                    <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="task_class" value="Done">
-                        <button type="submit" class="button move-button">Siirrä Done</button>
-                    </form>
-                {% endif %}
-                
-                {% if task.task_class.title != "Backlog" %}
-                    <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="task_class" value="Backlog">
-                        <button type="submit" class="button move-button">Siirrä Backlog</button>
-                    </form>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="comments-section">
-            <h3>Kommentit</h3>
-            {% for comment in task.comments.all %}
-                <div class="comment">
-                    <strong>{{ comment.user.username }}</strong> - {{ comment.created_at|date:"d.m.Y H:i" }}
-                    <p>{{ comment.content }}</p>
-                    {% if user == comment.user or user.is_superuser %}
-                        <a href="{% url 'delete_comment' task.id comment.id %}" 
-                           onclick="return confirm('Haluatko varmasti poistaa tämän kommentin?')"
-                           class="delete-comment">Poista kommentti</a>
-                    {% endif %}
-                </div>
-            {% empty %}
-                <p>Ei kommentteja vielä.</p>
-            {% endfor %}
-
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'add_comment' task.id %}" class="comment-form">
+            
+            {% if task.task_class.title != "In progress" %}
+                <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
                     {% csrf_token %}
-                    <textarea name="content" placeholder="Kirjoita kommentti..." required></textarea>
-                    <button type="submit">Lähetä kommentti</button>
+                    <input type="hidden" name="task_class" value="In progress">
+                    <button type="submit" class="button move-button">Siirrä In Progress</button>
+                </form>
+            {% endif %}
+            
+            {% if task.task_class.title != "Done" %}
+                <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_class" value="Done">
+                    <button type="submit" class="button move-button">Siirrä Done</button>
+                </form>
+            {% endif %}
+            
+            {% if task.task_class.title != "Backlog" %}
+                <form method="post" action="{% url 'task_edit_model_form' task.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_class" value="Backlog">
+                    <button type="submit" class="button move-button">Siirrä Backlog</button>
                 </form>
             {% endif %}
         </div>
     </div>
+
+    <div class="comments-section">
+        <h3>Kommentit</h3>
+        {% for comment in task.comments.all %}
+            <div class="comment">
+                <strong>{{ comment.user.username }}</strong> - {{ comment.created_at|date:"d.m.Y H:i" }}
+                <p>{{ comment.content }}</p>
+                {% if user == comment.user or user.is_superuser %}
+                    <a href="{% url 'delete_comment' task.id comment.id %}" 
+                       onclick="return confirm('Haluatko varmasti poistaa tämän kommentin?')"
+                       class="delete-comment">Poista kommentti</a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>Ei kommentteja vielä.</p>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'add_comment' task.id %}" class="comment-form">
+                {% csrf_token %}
+                <textarea name="content" placeholder="Kirjoita kommentti..." required></textarea>
+                <button type="submit">Lähetä kommentti</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
 {% endblock %} 
