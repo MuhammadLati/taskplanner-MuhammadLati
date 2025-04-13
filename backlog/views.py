@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, Http404
 from .models import Task, TaskClass, Comment
 from .forms import TaskEditModelForm
+from rest_framework import generics
+from .serializers import TaskSerializer
+from rest_framework.permissions import IsAuthenticated
 
 @login_required
 def task_list(request):
@@ -133,3 +136,22 @@ def delete_comment(request, task_id, comment_id):
         
     comment.delete()
     return redirect('task_detail', task_id=task_id)
+
+class TaskListAPI(generics.ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return Task.objects.all()
+        return Task.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class TaskDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]

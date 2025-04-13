@@ -9,4 +9,6 @@ urlpatterns = [
     path("tasks/", include("backlog.urls")),  # ✅ Ensure backlog app's URLs are included
     path("login/", auth_views.LoginView.as_view(template_name="login.html"), name="login"),  # Muutettu template_name
     path("logout/", auth_views.LogoutView.as_view(next_page="/login/"), name="logout"),  # ✅ Logout URL
+    # Add the API URLs
+    path('', include('backlog.urls')),
 ]
