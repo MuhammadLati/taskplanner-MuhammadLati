@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #1a1a1a;
-  color: #333;
+  color: white;
   min-height: 100vh;
 }
 
@@ -50,82 +50,93 @@ body {
 }
 
 .container {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
   padding: 20px;
+  margin: 0 auto;
 }
 
 .title {
   text-align: center;
-  color: #fff;
-  margin-bottom: 40px;
-  font-size: 2.5em;
+  color: white;
+  margin-bottom: 20px;
+  font-size: 2em;
 }
 
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .task-card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 16px;
 }
 
-.task-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.task-title {
-  margin: 0;
-  font-size: 1.5em;
+.task-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
   color: #333;
-  font-weight: 600;
 }
 
-.task-description {
-  margin: 0;
+.task-card p {
+  margin: 0 0 12px 0;
   color: #666;
-  font-size: 1em;
-  line-height: 1.5;
+  font-size: 14px;
 }
 
 .task-meta {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
   align-items: center;
-  margin-top: 8px;
 }
 
 .priority-tag {
-  color: #666;
-  font-size: 0.9em;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.priority-tag.high {
+  background-color: #dc3545;
+  color: white;
+}
+
+.priority-tag.medium {
+  background-color: #ffc107;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.priority-tag.low {
+  background-color: #28a745;
+  color: white;
 }
 
 .status-tag {
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.9em;
-  font-weight: 500;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
   cursor: pointer;
 }
 
 .status-tag.completed {
-  background-color: #4caf50;
+  background-color: #198754;
   color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
 }
 
 .status-tag.in-progress {
-  background-color: #2196f3;
-  color: white;
+  background-color: #ffc107;
+  color: #333;
 }
 
 .task-actions {
@@ -197,4 +208,106 @@ body {
 
 .cancel-button:hover {
   background-color: #d32f2f;
+}
+
+/* Add Task Form Styles */
+.add-task-form {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.add-task-form h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+}
+
+.add-task-form label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.add-task-form input[type="text"],
+.add-task-form textarea,
+.add-task-form select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.add-task-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.add-task-form .checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-task-form .checkbox-group label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.add-task-form button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-task-button {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+.add-task-button:hover {
+  background-color: #0b5ed7;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.kanban-column {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 200px;
+}
+
+.column-title {
+  color: #333;
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.no-tasks {
+  color: #666;
+  text-align: center;
+  font-size: 14px;
+  padding: 20px 0;
 }

@@ -1,6 +1,10 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 from .views import TaskListAPI, TaskDetailAPI
+
+router = DefaultRouter()
+router.register(r'tasks', views.TaskViewSet, basename='task')
 
 urlpatterns = [
     path("", views.task_list, name="task_list"),
@@ -12,6 +16,6 @@ urlpatterns = [
     path("tasks/<int:task_id>/comment/<int:comment_id>/delete/", views.delete_comment, name="delete_comment"),
     path("debug/tasks/", views.debug_tasks, name="debug_tasks"),
     # API endpoints
-    path("api/tasks/", TaskListAPI.as_view(), name="task_list_api"),
-    path("api/tasks/<int:pk>/", TaskDetailAPI.as_view(), name="task_detail_api"),
+    path("api/", include(router.urls)),
+    path("api/task-classes/", views.get_task_classes, name="task-classes"),
 ]
